@@ -1,9 +1,11 @@
 package jm.task.core.jdbc;
 
+import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class Main {
@@ -17,7 +19,11 @@ public class Main {
         userService.saveUser("Will", "Byers", (byte) 18);
 
         userService.removeUserById(2);
-        userService.getAllUsers();
+
+        // print
+        List<User> users = userService.getAllUsers();
+        users.stream().forEach(System.out :: println);
+
         userService.cleanUsersTable();
         userService.dropUsersTable();
     }
