@@ -23,41 +23,74 @@ public class UserDaoJDBCImpl implements UserDao {
                 "age INT NOT NULL, " +
                 "PRIMARY KEY (id));";
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
+            Util.rollbackCommit(connection);
             e.printStackTrace();
         }
     }
 
     public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate("DROP TABLE if EXISTS Users");
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
+            Util.rollbackCommit(connection);
             e.printStackTrace();
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO USERS (NAME, LASTNAME, AGE) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Users (NAME, LASTNAME, AGE) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            connection.setAutoCommit(false);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
+            connection.setAutoCommit(true);
             System.out.printf("User с именем – %s добавлен в базу данных\n", name);
         } catch (SQLException e) {
+            Util.rollbackCommit(connection);
             e.printStackTrace();
         }
     }
 
     public void removeUserById(long id) {
-        String sql = "DELETE FROM Users WHERE id = ?";
+
+        if (isUserExist(id)) {
+            String sql = "DELETE FROM Users WHERE id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                connection.setAutoCommit(false);
+                preparedStatement.setLong(1, id);
+                preparedStatement.execute();
+                connection.commit();
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                Util.rollbackCommit(connection);
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public boolean isUserExist(long id) {
+
+        String sql = "SELECT id FROM Users WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
-            preparedStatement.execute();
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public List<User> getAllUsers() {
@@ -83,10 +116,14 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String sql = "DELETE FROM Users";
+        String sql = "TRUNCATE TABLE Users";
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
+            Util.rollbackCommit(connection);
             e.printStackTrace();
         }
     }
