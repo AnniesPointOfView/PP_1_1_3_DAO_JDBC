@@ -29,7 +29,6 @@ public class Util {
     }
 
     public static Connection getConnection() {
-
         Connection connection = null;
 
         try {
@@ -41,6 +40,16 @@ public class Util {
         }
 
         return connection;
+    }
+
+    public static void rollbackCommit(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
