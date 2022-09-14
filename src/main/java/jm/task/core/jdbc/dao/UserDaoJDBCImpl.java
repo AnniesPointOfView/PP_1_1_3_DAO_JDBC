@@ -116,7 +116,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String sql = "TRUNCATE TABLE Users";
+        String sql = "DELETE FROM Users";
         try (Statement statement = connection.createStatement()) {
             connection.setAutoCommit(false);
             statement.executeUpdate(sql);
