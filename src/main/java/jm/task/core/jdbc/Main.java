@@ -26,7 +26,7 @@ public class Main {
         userService.saveUser("Lucas", "Sinclair", (byte) 19);
         userService.saveUser("Will", "Byers", (byte) 18);
 
-        userService.removeUserById(2);
+        userService.removeUserById(7);
 
         // print
         List<User> users = userService.getAllUsers();
